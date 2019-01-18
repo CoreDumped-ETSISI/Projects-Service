@@ -1,6 +1,7 @@
 'use strict'
 
 const telegramUserRegex = /@([A-Za-z0-9_])/
+const productNameRegex = /([A-Za-z0-9_])/
 
 
 function validDuration(duration) {
@@ -22,10 +23,25 @@ function validParticipants(participants) {
     return true
 }
 
-function validRecommendedParticipants() {
+function validRecommendedParticipants(recommendedParticipanst) {
     return participants >= 0
 }
 
 function validFeaturesList(featuresList) {
     return featuresList.length > 0
+}
+
+function validProjectName(projectName) {
+    return projectName &&
+    projectName>0 &&
+    projectName.test(productNameRegex)
+}
+
+module.exports = {
+    validDuration,
+    validFeaturesList,
+    validParticipants,
+    validProductOwner,
+    validProjectName,
+    validRecommendedParticipants
 }
