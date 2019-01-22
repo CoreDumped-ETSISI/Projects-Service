@@ -1,13 +1,13 @@
 'use strict';
 
 const mongoose = require('mongoose');
-const ProjectSchema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
 const states = ['Pendiente', 'Definido', 'En desarrollo', 'Terminado'];
 
 const ProjectSchema= new Schema({
     projectName: String,
-    icon: File,
+    icon: String,
     recommendedParticipants: Number,
     duration: Number,
     description: String,

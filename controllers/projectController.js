@@ -4,6 +4,8 @@ const Project = require('../models/project')
 const config = require('../config')
 const input = require('../inputValidators')
 
+const states = ['Pendiente', 'Definido', 'En desarrollo', 'Terminado'];
+
 
 function createProject(req,res){
     let projectName = req.body.projectName
@@ -11,12 +13,11 @@ function createProject(req,res){
     let recommendedParticipants = req.body.recommendedParticipants
     let duration = req.body.duration
     let featuresList = req.body.featuresList
-    let projectOwner = req.body. projectOwner
+    let productOwner = req.body.productOwner
 
     if (!input.validFeaturesList(featuresList)) return res.status(400).send({message: "Error en la lista de funcionalidades"})
     if (!input.validDuration(duration)) return res.status(400).send({message: "Error en la duración en semanas del proyecto"})
-    if (!input.validParticipants(participants)) return res.status(400).send({message: "Error en los participantes"})
-    if (!input.validProductOwner(projectOwner)) return res.status(400).send({message: "Error en el nompre del dueño del proyecto"})
+    if (!input.validProductOwner(productOwner)) return res.status(400).send({message: "Error en el nompre del dueño del proyecto"})
     if (!input.validProjectName(projectName)) return res.status(400).send({message: "Error en el nombre del proyecto"})
     if (!input.validRecommendedParticipants(recommendedParticipants)) return res.status(400).send({message: "Error en el numero de participantes"})
 
@@ -24,7 +25,7 @@ function createProject(req,res){
         if (err) return res.status(500).send({message: "Error del servidor."})
         if (project) return res.status(409).send({message: "Ya existe un proyecto con este nombre"})
 
-        const project = new Project( {
+        const newProject = new Project( {
             projectName: projectName,
             icon: icon,
             recommendedParticipants: recommendedParticipants,
@@ -32,12 +33,12 @@ function createProject(req,res){
             featuresList: featuresList,
             repository: req.body.repository || "",
             documentationUrl: req.body.documentationUrl || "",
-            projectOwner: projectOwner,
+            productOwner: productOwner,
             participants: req.body.participants || [],
-            currentState: Project.currentState[0]
+            currentState: states[0]
         })
 
-        project.save((err, projectSaved) => {
+        newProject.save((err, projectSaved) => {
             if (err) return res.status(500).send({message: "Error de la base de datos."})
             if (!projectSaved) return res.status(422).send({message: "Error al almacenar en la base de datos"})
             return res.status(200).send(projectSaved)
@@ -46,35 +47,36 @@ function createProject(req,res){
 }
 
 function getProjectByName(req, res) {
-    let projectName = req.body.projectName
+    let projectName = req.query.projectName
+    console.log(projectName)
     if(!input.validProjectName(projectName)) return res.status(400).send({message: "El nombre no es valido"})
-    Project.find(projectName, (err, project) => {
+    Project.findOne({projectName: projectName}, (err, project) => {
         if(err) return res.status(500).send({message: "Error del servidor"})
         if(!project) return res.status(404).send({message: "Proyecto no encontrado"})
-        return res.status(200).send(user)
+        return res.status(200).send(project)
     })
 }
 
-function getProjectByProjectOwner(req, res) {
-    let projectOwner = req.body.projectOwner
-    if(!input.validProjectOwner(projectOwner)) return res.status(400).send({message: "El nombre no es valido"})
-    Project.find(projectOwner, (err, project) => {
+function getProjectByProductOwner(req, res) {
+    let productOwner = req.query.productOwner
+    if(!input.validProductOwner(productOwner)) return res.status(400).send({message: "El nombre no es valido"})
+    Project.findOne({productOwner: productOwner}, (err, project) => {
         if(err) return res.status(500).send({message: "Error del servidor"})
         if(!project) return res.status(404).send({message: "Usuario no encontrado"})
-        return res.status(200).send(user)
+        return res.status(200).send(project)
     })
 }
 
 function getProjectList(req, res){
     Project.find({}, (err, projects) => {
-        if (err) return res.status(500).send({message: "Error"})
-        if (projects) return res.status(404).send({message: "Error"})
+        if (err) return res.status(500).send({message: "Error del servidor"})
+        if (!projects) return res.status(404).send({message: "Error not found"})
         res.status(200).send(projects)
     })
 }
 
 function getAllButFinishedOnes(req, res) {
-    Project.find({currentState: currentState[0] || currentState[1] || currentState[2]}, (err, projects) =>{
+    Project.find({currentState: states[0] || states[1] || states[2]}, (err, projects) =>{
         if(err) return res.status(500).send({message: "Error del servidor"})
         if(!projects) return res.status(404).send({message: "No hay proyectos encontrados"})
         return res.status(200).send(projects)
@@ -82,17 +84,24 @@ function getAllButFinishedOnes(req, res) {
 }
 
 function getAllProjectNames(req, res) {
-    Project.find({currentState: currentState[0] || currentState[1] || currentState[2]}, (err, projects) =>{
+    Project.find({}, (err, projects) =>{
         if(err) return res.status(500).send({message: "Error del servidor"})
         if(!projects) return res.status(404).send({message: "No hay proyectos encontrados"})
-        return res.status(200).send(Project.projectName)
+        
+        let projectNames = []
+        
+        projects.forEach(project =>{
+            projectNames.push(project.projectName)
+        })
+        
+        return res.status(200).send(projectNames)
     })
 }
 
 module.exports = {
     createProject,
     getProjectByName,
-    getProjectByProjectOwner,
+    getProjectByProductOwner,
     getProjectList,
     getAllButFinishedOnes,
     getAllProjectNames

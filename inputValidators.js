@@ -9,22 +9,20 @@ function validDuration(duration) {
 }
 
 function validProductOwner(productOwner) {    
-    return productOwner && 
-    productOwner > 0 && 
-    ownerPattern.test(telegramUserRegex) 
+    return telegramUserRegex.test(productOwner)
 }
 
 function validParticipants(participants) {
     participants.forEach(element => {
-        if (!element.test(telegramUserRegex))
+        if (!telegramUserRegex.test(element))
             return false
     })
 
     return true
 }
 
-function validRecommendedParticipants(recommendedParticipanst) {
-    return participants >= 0
+function validRecommendedParticipants(recommendedParticipants) {
+    return recommendedParticipants >= 1
 }
 
 function validFeaturesList(featuresList) {
@@ -32,9 +30,7 @@ function validFeaturesList(featuresList) {
 }
 
 function validProjectName(projectName) {
-    return projectName &&
-    projectName>0 &&
-    projectName.test(productNameRegex)
+    return productNameRegex.test(projectName)
 }
 
 module.exports = {
