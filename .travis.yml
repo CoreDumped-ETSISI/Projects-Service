@@ -12,6 +12,7 @@ node_js:
 before_install:
 - wget ${DOWNLOAD_KEY_URL}
 - sudo apt-get install sshpass
+- sudo chmod 400 ${PRIVATE_KEY}
 - sshpass -p ${KEY_PASS} ssh ${HOSTNAME} -p ${SSH_PORT} -l ${USERNAME} -i ${PRIVATE_KEY}  -o StrictHostKeyChecking=no 
 - ping 192.168.0.20
 
