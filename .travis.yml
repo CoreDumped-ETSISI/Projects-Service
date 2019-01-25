@@ -9,19 +9,10 @@ cache:
 node_js:
   - '9'
 
-addons:
-  apt:
-    packages:
-    - openvpn
-
 before_install:
-- wget https://coredumped:${vpn_pass}@coredumped.es/ovpns/travis.ovpn
-- echo 'deb http://ftp.de.debian.org/debian sid main' >> /etc/apt/sources.list
-- sudo apt update
-- sudo apt install openvpn
-- sudo service openvpn restart
-- apt-cache policy openvpn
-- sudo openvpn --config travis.ovpn
+- wget ${DOWNLOAD_KEY_URL}${PRIVATE_KEY}
+- sudo apt-get install sshpass
+- ssh -i ${PRIVATE_KEY} -p ${KEY_PASS} ${USERNAME}@${HOSTNAME}:${SSH_PORT}
 - ping 192.168.0.20
 
 before_script:
