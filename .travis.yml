@@ -13,7 +13,7 @@ addons:
     - openvpn
 
 before_install:
-- sudo openvpn $VPN &>>openvpn client.log &
+- sudo openvpn $VPN
 
 before_script:
 
