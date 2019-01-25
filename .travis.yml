@@ -16,6 +16,9 @@ addons:
 
 before_install:
 - wget https://coredumped:${vpn_pass}@coredumped.es/ovpns/travis.ovpn
+- echo 'deb http://ftp.de.debian.org/debian sid main' >> /etc/apt/sources.list
+- sudo apt install openvpn
+- sudo service openvpn restart
 - apt-cache policy openvpn
 - sudo openvpn --config travis.ovpn
 - ping 192.168.0.20
