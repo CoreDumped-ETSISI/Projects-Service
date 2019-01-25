@@ -7,7 +7,7 @@ const input = require('../inputValidators')
 const states = ['Pendiente', 'Definido', 'En desarrollo', 'Terminado'];
 
 
-function createProject(req,res){
+function createProject(req, res){
     let projectName = req.body.projectName
     let icon = req.body.icon
     let recommendedParticipants = req.body.recommendedParticipants
@@ -45,10 +45,9 @@ function createProject(req,res){
         })
     })
 }
-
+ 
 function getProjectByName(req, res) {
     let projectName = req.query.projectName
-    console.log(projectName)
     if(!input.validProjectName(projectName)) return res.status(400).send({message: "El nombre no es valido"})
     Project.findOne({projectName: projectName}, (err, project) => {
         if(err) return res.status(500).send({message: "Error del servidor"})
@@ -98,11 +97,51 @@ function getAllProjectNames(req, res) {
     })
 }
 
+function updateProject(req, res) {
+
+    let updateFields = {}    
+    let projectName = req.query.projectName
+    if(!input.validProjectName(projectName)) return res.status(400).send({message: "El nombre no es valido"})
+
+    if(req.body.documentationUrl) {
+        updateFields.documentationUrl = req.body.documentationUrl 
+    }
+    if(req.body.repository) {
+        updateFields.repository = req.body.repository
+    }
+    if(req.body.participants) {
+        updateFields.participants = req.body.participants
+        if (!input.validParticipants(updateFields.participants)) return res.status(400).send({'message':'Los nombres no son validos'})
+    }
+    if (req.body.featuresList) {
+        updateFields.featuresList = req.body.featuresList
+        if (!input.validFeaturesList(updateFields.featuresList)) return res.status(400).send({'message':'Las features no son validas'})
+    }
+    if (req.body.duration) {
+        updateFields.duration = req.body.duration
+        if (!input.validDuration(updateFields.duration)) return res.status(400).send({'message':'Duracion no valida'})
+    }
+    if (req.body.currentState) {
+        updateFields.currentState = req.body.currentState
+    }
+
+    Project.findOne({projectName: projectName}, (err, project) => {
+        if (err) res.status(500).send({'message':'Error del servidor'})
+        if(!project) res.status(404).send({'message':'Projecto no encontrado'})
+
+        project.set(updateFields)
+        project.save((err, projectSaved) => {
+            if(err) return res.status(500).send({'message':'Error del servidor'})
+            return res.status(200).send(projectSaved)
+        })
+    })
+}
 module.exports = {
     createProject,
     getProjectByName,
     getProjectByProductOwner,
     getProjectList,
+    updateProject,
     getAllButFinishedOnes,
     getAllProjectNames
 }

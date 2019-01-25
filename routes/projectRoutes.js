@@ -29,6 +29,7 @@ router.post('/uploadIcon', function (req, res) {
   })
 router.post('/createProject', projectController.createProject)
 router.get('/getProjectByName', projectController.getProjectByName)
+router.put('/updateProject', projectController.updateProject)
 router.get('/getProjectList', projectController.getProjectList)
 router.get('/getProjectByProductOwner', projectController.getProjectByProductOwner)
 router.get('/getAllButFinishedOnes', projectController.getAllButFinishedOnes)
