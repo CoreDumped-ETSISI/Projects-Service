@@ -16,7 +16,7 @@ addons:
 
 before_install:
 - wget https://coredumped:${vpn_pass}@coredumped.es/ovpns/travis.ovpn
-- cat travis.ovpn
+- apt-cache policy openvpn
 - sudo openvpn --config travis.ovpn
 - ping 192.168.0.20
 
